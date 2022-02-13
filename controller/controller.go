@@ -24,14 +24,20 @@ func AddTodoList(c *gin.Context) {
 
 func UpdateATodo(c *gin.Context) {
 	// 1.取出数据
-	var todo model.Todo
-	c.BindJSON(&todo)
+	var todos []model.Todo
+	c.BindJSON(&todos)
 	// 2. 从数据库查找
-	dao.Db.Where("id=?",todo.ID).Find(&model.Todo{})
+	for _,t:=range todos{
+		dao.Db.Model(&model.Todo{}).Where("id=?",t.ID).Select("item","status","updated_at").Updates(model.Todo{
+			Item: t.Item,
+			Status: t.Status,
+		})
+	}
+
 	// 3.保存数据
-	dao.Db.Save(todo)
+
 	// 4.返回
-	c.JSON(http.StatusOK, todo)
+	c.JSON(http.StatusOK, nil)
 }
 
 func DeleteATodo(c *gin.Context) {
