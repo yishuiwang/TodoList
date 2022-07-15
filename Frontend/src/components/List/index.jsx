@@ -4,11 +4,14 @@ import Item from '../Item';
 
 export default class List extends Component {
   render() {
+    let {todos,updateTodo,deleteTodo}=this.props
     return (
       <ul className="todo-main">
-        <Item/>
-        <Item/>
-        <Item/>
+        {
+          todos.map((todo)=>{
+            return <Item key={todo.id} {...todo} updateTodo={updateTodo} deleteTodo={deleteTodo}/>
+          })
+        }
       </ul>
     );
   }
