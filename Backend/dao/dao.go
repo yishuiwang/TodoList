@@ -8,22 +8,22 @@ import (
 
 var Db *gorm.DB
 
-func Init(){
+func Init() {
 	mysqldb, err := gorm.Open(mysql.New(mysql.Config{
-		DSN: "root:sbsz@tcp(127.0.0.1:3306)/web?charset=utf8&parseTime=True&loc=Local",
-		DefaultStringSize: 256,
-		DisableDatetimePrecision: true,
-		DontSupportRenameIndex: true,
-		DontSupportRenameColumn: true,
+		DSN:                       "root:sbsz@tcp(127.0.0.1:3306)/todo?charset=utf8&parseTime=True&loc=Local",
+		DefaultStringSize:         256,
+		DisableDatetimePrecision:  true,
+		DontSupportRenameIndex:    true,
+		DontSupportRenameColumn:   true,
 		SkipInitializeWithVersion: false,
 	}), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
-			TablePrefix: "",
+			TablePrefix:   "",
 			SingularTable: true,
 		},
 	})
 	if err != nil {
 		return
 	}
-	Db=mysqldb
+	Db = mysqldb
 }

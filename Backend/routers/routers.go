@@ -7,10 +7,6 @@ import (
 )
 
 func SetupRouter() *gin.Engine{
-	/*
-		 url     --> controller  --> logic   -->    model
-		请求来了  -->  控制器      --> 业务逻辑  --> 模型层的增删改查
-	*/
 	http.Handle("/static/",http.FileServer(http.Dir("static/")))
 	r := gin.Default()
 	// v1
