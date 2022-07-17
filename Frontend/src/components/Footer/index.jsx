@@ -1,25 +1,37 @@
 import React, { Component } from 'react';
+import PubSub from 'pubsub-js'
+
 import './index.css';
 export default class Footer extends Component {
+  
+
+  state={
+    all:3,
+    complete:2,
+  }
+
   checkAll = (event) => {
-    console.log('sbsz');
-    console.log(event.target.checked);
-    this.props.checkAll(event.target.checked);
+   PubSub.publish('checkall',event.target.checked)
   };
 
-  clearAll = () => {
-    this.props.clearAll()
+  clearAll = (event) => {
+    PubSub.publish('clearAll',event.target.checked)
   };
+
+  componentDidMount(){
+    PubSub.subscribe('todos',(_,todos)=>{
+      let {all,complete}=this.state
+      all = todos.length;
+      complete = 0;
+      for (var i in todos) {
+        if (todos[i].done) complete++;
+      }
+      this.setState({all,complete})
+    })
+  }
 
   render() {
-    let { todos } = this.props;
-
-    let all = todos.length;
-    let complete = 0;
-    for (var i in todos) {
-      if (todos[i].done) complete++;
-    }
-
+    let {all,complete}=this.state
     return (
       <div className="todo-footer">
         <label>
