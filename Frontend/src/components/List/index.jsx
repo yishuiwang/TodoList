@@ -1,89 +1,80 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import { nanoid } from 'nanoid';
 import PubSub from 'pubsub-js';
 import './index.css';
 import Item from '../Item';
 
-export default class List extends Component {
-  state = {
-    todos: [
-      { id: '001', name: '吃饭', done: true },
-      { id: '002', name: '睡觉', done: false },
-      { id: '003', name: '敲代码', done: true },
-    ],
-  };
+export default function List() {
+  const [todos, setTodos] = React.useState([
+    { id: '001', name: '吃饭', done: true },
+    { id: '002', name: '睡觉', done: false },
+    { id: '003', name: '敲代码', done: true },
+  ]);
 
-  componentDidMount() {
-    PubSub.subscribe('addTodo', (_, name) => {
-      let todoObj = { id: nanoid(), name: name, done: false };
-      let { todos } = this.state;
-      let newTodos = [todoObj, ...todos];
-      this.setState({ todos: newTodos });
-    });
+  useEffect(() => {
+    const checkAll = () => {
+      PubSub.subscribe('checkall', (_, flag) => {
+        let newTodos = todos.map((value) => {
+          value.done=flag
+          return value
+        });
+        setTodos(newTodos);
+      });
+    };
+    checkAll();
 
-    PubSub.subscribe('checkall',(_, flag)=>{
-      this.checkAll(flag)
-    })
+    const addTodo = () => {
+      PubSub.subscribe('addTodo', (_, name) => {
+        let todoObj = { id: nanoid(), name: name, done: false };
+        let newTodos = [todoObj, ...todos];
+        setTodos(newTodos);
+      });
+    };
+    addTodo();
 
-    PubSub.subscribe('clearAll',()=>{
-      this.clearAll()
-    })
+    const clearAll = () => {
+      PubSub.subscribe('clearAll', () => {
+        let newTodos = todos.filter((todoObj) => {
+          return todoObj.done === false;
+        });
+        setTodos(newTodos);
+      });
+    };
+    clearAll();
+  }, [todos]);
 
-  }
+  useEffect(() => {
+    PubSub.publish('todos', todos);
+  });
 
-  componentDidUpdate() {
-    PubSub.publish('todos', this.state.todos);
-  }
-
-  deleteTodo = (id) => {
-    let { todos } = this.state;
-    todos = todos.filter((todoObj) => {
+  function deleteTodo(id) {
+    let newTodos = todos;
+    newTodos = newTodos.filter((todoObj) => {
       return todoObj.id !== id;
     });
-    this.setState({ todos });
-  };
+    setTodos(newTodos);
+  }
 
-  updateTodo = (id, done) => {
-    let { todos } = this.state;
+  function updateTodo(id, done) {
     let newTodos = todos.map((todoObj) => {
       if (todoObj.id === id) return { ...todoObj, done };
       else return todoObj;
     });
-    this.setState({ todos: newTodos });
-  };
-
-  checkAll = (flag) => {
-    let { todos } = this.state;
-    for (var i in todos) {
-      todos[i].done = flag;
-    }
-
-    this.setState({ todos });
-  };
-
-  clearAll = () => {
-    let { todos } = this.state;
-    todos = todos.filter((todoObj) => {
-      return todoObj.done === false;
-    });
-    this.setState({ todos });
-  };
-
-  render() {
-    let { todos } = this.state;
-    return (
-      <ul className="todo-main">
-        {todos.map((todo) => {
-          return (
-            <Item
-              key={todo.id}
-              {...todo}
-              deleteTodo={this.deleteTodo}
-              updateTodo={this.updateTodo}
-            />
-          );
-        })}
-      </ul>
-    );
+    setTodos(newTodos);
   }
+
+  return (
+    <ul className="todo-main">
+      {todos.map((todo) => {
+        return (
+          <Item
+            key={todo.id}
+            {...todo}
+            deleteTodo={deleteTodo}
+            updateTodo={updateTodo}
+          />
+        );
+      })}
+    </ul>
+  );
 }
