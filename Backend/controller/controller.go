@@ -14,22 +14,22 @@ func IndexHandler(c *gin.Context) {
 func AddTodoList(c *gin.Context) {
 	// 1.取出数据
 	var todo model.Todo
-	c.BindJSON(&todo)
+	c.ShouldBind(&todo)
 	// 2. 存入数据库
 	dao.Db.Create(&todo)
 	// 3.返回
-	c.JSON(http.StatusOK,todo)
+	c.JSON(http.StatusOK, todo)
 
 }
 
 func UpdateATodo(c *gin.Context) {
 	// 1.取出数据
 	var todos []model.Todo
-	c.BindJSON(&todos)
+	c.ShouldBind(&todos)
 	// 2. 从数据库查找
-	for _,t:=range todos{
-		dao.Db.Model(&model.Todo{}).Where("id=?",t.ID).Select("item","status","updated_at").Updates(model.Todo{
-			Item: t.Item,
+	for _, t := range todos {
+		dao.Db.Model(&model.Todo{}).Where("id=?", t.ID).Select("item", "status", "updated_at").Updates(model.Todo{
+			Item:   t.Item,
 			Status: t.Status,
 		})
 	}
@@ -43,20 +43,20 @@ func UpdateATodo(c *gin.Context) {
 func DeleteATodo(c *gin.Context) {
 	// 1.取出数据
 	var todo model.Todo
-	c.BindJSON(&todo)
+	c.ShouldBind(&todo)
 	// 2. 从数据库删除
-	dao.Db.Where("id=?",todo.ID).Delete(&model.Todo{})
+	dao.Db.Where("id=?", todo.ID).Delete(&model.Todo{})
 	// 3.返回
-	c.JSON(http.StatusOK,nil)
+	c.JSON(http.StatusOK, nil)
 }
 
 func FindTodoList(c *gin.Context) {
 	// 1.取出数据
 	var todos []model.Todo
-	c.BindJSON(&todos)
+	c.ShouldBind(&todos)
 	// 2. 从数据库查找
 	dao.Db.Select("*").Find(&todos)
 	// 3.返回
-	c.JSON(http.StatusOK,todos)
+	c.JSON(http.StatusOK, todos)
 
 }
