@@ -1,43 +1,30 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mod/dao"
 	"go.mod/model"
 	"net/http"
 )
 
-func IndexHandler(c *gin.Context) {
-	c.HTML(http.StatusOK, "index.html", nil)
-}
-
 func AddTodoList(c *gin.Context) {
 	// 1.取出数据
 	var todo model.Todo
 	c.ShouldBind(&todo)
 	// 2. 存入数据库
-	dao.Db.Create(&todo)
+	dao.DB.Create(&todo)
 	// 3.返回
 	c.JSON(http.StatusOK, todo)
 
 }
 
 func UpdateATodo(c *gin.Context) {
-	// 1.取出数据
-	var todos []model.Todo
-	c.ShouldBind(&todos)
-	// 2. 从数据库查找
-	for _, t := range todos {
-		dao.Db.Model(&model.Todo{}).Where("id=?", t.ID).Select("item", "status", "updated_at").Updates(model.Todo{
-			Item:   t.Item,
-			Status: t.Status,
-		})
-	}
-
-	// 3.保存数据
-
-	// 4.返回
-	c.JSON(http.StatusOK, nil)
+	var todo model.Todo
+	c.ShouldBind(&todo)
+	fmt.Println(todo)
+	dao.DB.Model(&todo).Update("status", todo.Status)
+	c.JSON(http.StatusOK, gin.H{"msg": "已更新"})
 }
 
 func DeleteATodo(c *gin.Context) {
@@ -45,9 +32,9 @@ func DeleteATodo(c *gin.Context) {
 	var todo model.Todo
 	c.ShouldBind(&todo)
 	// 2. 从数据库删除
-	dao.Db.Where("id=?", todo.ID).Delete(&model.Todo{})
+	dao.DB.Where("id=?", todo.ID).Delete(&model.Todo{})
 	// 3.返回
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusOK, gin.H{"msg": "已删除"})
 }
 
 func FindTodoList(c *gin.Context) {
@@ -55,7 +42,7 @@ func FindTodoList(c *gin.Context) {
 	var todos []model.Todo
 	c.ShouldBind(&todos)
 	// 2. 从数据库查找
-	dao.Db.Select("*").Find(&todos)
+	dao.DB.Select("*").Find(&todos)
 	// 3.返回
 	c.JSON(http.StatusOK, todos)
 

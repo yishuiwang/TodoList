@@ -4,6 +4,6 @@ import "gorm.io/gorm"
 
 type Todo struct {
 	gorm.Model
-	Item string
+	Name   string
 	Status uint
 }

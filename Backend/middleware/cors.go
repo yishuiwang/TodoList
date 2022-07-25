@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// 跨域
+//Cors 跨域
 func Cors() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctx.Writer.Header().Set("Access-Control-Allow-Origin", "*")
